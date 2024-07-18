@@ -46,9 +46,11 @@ json_file_dict = {
   '2022D_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
   '2022D_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
   '2022E'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
+
   '2023B'       : 'Cert_Collisions2023_eraB_366403_367079_Golden.json',
   '2023C'       : 'Cert_Collisions2023_eraC_367095_368823_Golden.json',
   '2023D'       : 'Cert_Collisions2023_eraD_369803_370790_Golden.json',
+
   '2024B'       : 'Cert_Collisions2024_eraB_Golden.json',
   '2024C'       : 'Cert_Collisions2024_eraC_Golden.json',
   '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
@@ -106,18 +108,18 @@ for era in json_file_dict.keys():
     mutau_v = 'v3'
 #     path_name = 'HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_%s'%path_v
     if int(irun) > 355862: ditau_v = 'v2'
-    elif int(irun) > 359246 : ditau_v = 'v3'
-    elif int(irun) > 366403 : ditau_v = 'v4'
-    elif int(irun) > 367661 : ditau_v = 'v5'
+    if int(irun) > 359246 : ditau_v = 'v3'
+    if int(irun) > 366403 : ditau_v = 'v4'
+    if int(irun) > 367661 : ditau_v = 'v5'
     ## from here is 2024
-    elif int(irun) > 378985 : ditau_v = 'v8'
-    elif int(irun) > 380306 : 
+    if int(irun) > 378985 : ditau_v = 'v8'
+    if int(irun) > 380306 : 
       ditau_v = 'v9'
       mutau_v = 'v4'
-    elif int(irun) > 380963 : 
+    if int(irun) > 380963 : 
       ditau_v = 'v10'
       mutau_v = 'v5'
-    elif int(irun) > 382229 : 
+    if int(irun) > 382229 : 
       ditau_v = 'v11'
       mutau_v = 'v6'
     
@@ -172,7 +174,7 @@ for era in json_file_dict.keys():
   result_tmp  = fill_df.merge(lumi_df   , left_on='run_ls', right_on='run_ls')
   result_tmp2 = rate_df.merge(result_tmp, left_on='run_ls', right_on='run_ls')
   result      = pu_df.merge(result_tmp2, left_on='run_ls', right_on='run_ls')
-  result.to_csv('rate_lumi_pu_%s.csv'%(era), index=True)
+  result.to_csv('rate_lumi_pu_%s_%s.csv'%(path_type,era), index=True)
   
   # out = result.to_json(orient='index')[1:-1].replace('},{', '} {')
   # with open('rate_lumi_eraD%s.json'%part_str, 'w') as f:
