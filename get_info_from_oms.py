@@ -1,34 +1,65 @@
 from omsapi import OMSAPI
 import pandas as pd
 import json, time
-import pdb
+import pdb, argparse
 
 my_app_id='hlt_counts_and_lumi'
 my_app_secret='be9e7ffe-854c-46e1-afb0-c663baea504f'
 omsapi = OMSAPI("https://cmsoms.cern.ch/agg/api", "v1", cert_verify=False)
 omsapi.auth_oidc(my_app_id,my_app_secret)
 
-# part_str = '_part4'
-# era = 'eraE'
+parser = argparse.ArgumentParser(description="Convert MiniAOD to flat ntuples!")
+parser.add_argument(
+	"--year",
+	choices=['2022','2023', '2024'],
+	required=True,
+	help='Specify the year you want to investigate')
+
+parser.add_argument(
+	"--path",
+	required=False,
+	choices=['ditau','etau', 'mutau'],
+	default='ditau',
+	type=str,
+	help='Specify the hlt path')
+
+parser.add_argument(
+	"--nls",
+	required=False,
+	default=10,
+	type=int,
+	help='frequency of query, in LS')
+
+args = parser.parse_args()
+year = args.year
+path_type = args.path
+nLS = args.nls
+
 
 json_file_dict = {
-  'eraB_part1' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part1.json',
-  'eraB_part2' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part2.json',
-  'eraC_part1' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part1.json',
-  'eraC_part2' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part2.json',
-  'eraC_part3' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part3.json',
-  'eraD_part1' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part1.json',
-  'eraD_part2' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part2.json',
-  'eraD_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
-  'eraD_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
-  'eraE'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
+  '2022B_part2' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part2.json',
+  '2022C_part1' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part1.json',
+  '2022C_part2' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part2.json',
+  '2022C_part3' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part3.json',
+  '2022D_part1' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part1.json',
+  '2022D_part2' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part2.json',
+  '2022D_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
+  '2022D_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
+  '2022E'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
+  '2023B'       : 'Cert_Collisions2023_eraB_366403_367079_Golden.json',
+  '2023C'       : 'Cert_Collisions2023_eraC_367095_368823_Golden.json',
+  '2023D'       : 'Cert_Collisions2023_eraD_369803_370790_Golden.json',
+  '2024B'       : 'Cert_Collisions2024_eraB_Golden.json',
+  '2024C'       : 'Cert_Collisions2024_eraC_Golden.json',
+  '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
+  '2024E'       : 'Cert_Collisions2024_eraE_Golden.json',
+  '2024F'       : 'Cert_Collisions2024_eraF_Golden.json',
 }
 
 
 for era in json_file_dict.keys():
-## read physics json file
-# with open('Cert_Collisions2022_%s_357538_357900_Golden%s.json'%(era,part_str)) as f:
-# with open('Cert_Collisions2022_eraB_355100_355769_Golden.json') as f:
+  if year not in era:  continue
+  ## read physics json file
   with open(json_file_dict[era]) as f: 
     json_data = json.load(f)
 
@@ -50,6 +81,7 @@ for era in json_file_dict.keys():
   
   run_fill_dict = {}
   run_lumi_dict = {}
+  run_pu_dict = {}
   run_rate_dict = {}
   
   for irun in good_ls_dict.keys():
@@ -65,23 +97,44 @@ for era in json_file_dict.keys():
       if this_ls not in good_ls_dict[irun]:  continue
       run_lumi_dict[irun, this_ls] = ls['attributes']['init_lumi']
       run_fill_dict[irun, this_ls] = ls['attributes']['fill_number']
+      run_pu_dict[irun, this_ls] = ls['attributes']['pileup']
   
     print ('filled inst lumi dict')
-  
-  
+
     ## now fetch rate information per lumisection
-    path_v = 'v1'
-  #   if int(irun) > 355862: path_v = 'v2'
-#     if int(irun) > 359246 : path_v = 'v2'
+    ditau_v = 'v1'
+    mutau_v = 'v3'
 #     path_name = 'HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_%s'%path_v
-    if int(irun) > 355862: path_v = 'v2'
-    if int(irun) > 359246 : path_v = 'v3'
-    path_name = 'HLT_DoubleMediumChargedIsoDisplacedPFTauHPS32_Trk1_eta2p1_%s'%path_v
+    if int(irun) > 355862: ditau_v = 'v2'
+    elif int(irun) > 359246 : ditau_v = 'v3'
+    elif int(irun) > 366403 : ditau_v = 'v4'
+    elif int(irun) > 367661 : ditau_v = 'v5'
+    ## from here is 2024
+    elif int(irun) > 378985 : ditau_v = 'v8'
+    elif int(irun) > 380306 : 
+      ditau_v = 'v9'
+      mutau_v = 'v4'
+    elif int(irun) > 380963 : 
+      ditau_v = 'v10'
+      mutau_v = 'v5'
+    elif int(irun) > 382229 : 
+      ditau_v = 'v11'
+      mutau_v = 'v6'
     
+    if path_type=='ditau':
+      path_name = 'HLT_DoubleMediumChargedIsoDisplacedPFTauHPS32_Trk1_eta2p1_%s'%ditau_v
+    elif path_type=='mutau':
+      path_name = 'HLT_DisplacedMu24_MediumChargedIsoDisplacedPFTauHPS24_%s'%mutau_v
+    elif path_type=='etau':
+      path_name = 'HLT_Photon34_R9Id90_CaloIdL_IsoL_DisplacedIdL_MediumChargedIsoDisplacedPFTauHPS34_%s'%mutau_v
+    else:
+      print ('path type not recognised')
+      exit()  
     
-    for ils in good_ls_dict[irun][::10]:
+    for ils in good_ls_dict[irun][::nLS]:
       rate_query.clear_filter().filter("run_number", irun).filter('first_lumisection_number', ils).filter('path_name', path_name)#.custom("group[size]", 20)
       rate_resp = rate_query.paginate(page=1, per_page=10).data()
+      
       time.sleep(0.5)
       try:
         rate_list = rate_resp.json()['data'] ## list
@@ -98,6 +151,7 @@ for era in json_file_dict.keys():
   lumi_df = pd.DataFrame.from_dict(run_lumi_dict, orient='index', columns=['inst_lumi'])
   rate_df = pd.DataFrame.from_dict(run_rate_dict, orient='index', columns=['rate'])
   fill_df = pd.DataFrame.from_dict(run_fill_dict, orient='index', columns=['fill'])
+  pu_df   = pd.DataFrame.from_dict(run_pu_dict, orient='index', columns=['pileup'])
   
   lumi_df.index = lumi_df.index.set_names(['run_ls'])
   lumi_df.reset_index()
@@ -111,11 +165,14 @@ for era in json_file_dict.keys():
 
   fill_df.index = fill_df.index.set_names(['run_ls'])
   fill_df.reset_index()
+
+  pu_df.index = pu_df.index.set_names(['run_ls'])
+  pu_df.reset_index()
   
-  result_tmp = fill_df.merge(lumi_df, left_on='run_ls', right_on='run_ls')
-  result = rate_df.merge(result_tmp, left_on='run_ls', right_on='run_ls')
-  result.to_csv('rate_lumi_%s.csv'%(era), index=True)
-#   result.to_csv('rate_lumi_%s_prompt_ditau.csv'%(era), index=True)
+  result_tmp  = fill_df.merge(lumi_df   , left_on='run_ls', right_on='run_ls')
+  result_tmp2 = rate_df.merge(result_tmp, left_on='run_ls', right_on='run_ls')
+  result      = pu_df.merge(result_tmp2, left_on='run_ls', right_on='run_ls')
+  result.to_csv('rate_lumi_pu_%s.csv'%(era), index=True)
   
   # out = result.to_json(orient='index')[1:-1].replace('},{', '} {')
   # with open('rate_lumi_eraD%s.json'%part_str, 'w') as f:
