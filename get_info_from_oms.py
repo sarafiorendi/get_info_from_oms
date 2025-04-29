@@ -8,7 +8,7 @@ my_app_secret='be9e7ffe-854c-46e1-afb0-c663baea504f'
 omsapi = OMSAPI("https://cmsoms.cern.ch/agg/api", "v1", cert_verify=False)
 omsapi.auth_oidc(my_app_id,my_app_secret)
 
-parser = argparse.ArgumentParser(description="Convert MiniAOD to flat ntuples!")
+parser = argparse.ArgumentParser(description="get info from oms")
 parser.add_argument(
 	"--year",
 	choices=['2022','2023', '2024'],
@@ -37,25 +37,30 @@ nLS = args.nls
 
 
 json_file_dict = {
-  '2022B_part2' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part2.json',
-  '2022C_part1' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part1.json',
-  '2022C_part2' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part2.json',
-  '2022C_part3' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part3.json',
-  '2022D_part1' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part1.json',
-  '2022D_part2' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part2.json',
-  '2022D_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
-  '2022D_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
-  '2022E'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
+#   '2022B_part2' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part2.json',
+#   '2022C_part1' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part1.json',
+#   '2022C_part2' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part2.json',
+#   '2022C_part3' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part3.json',
+#   '2022C_part4' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part4.json',
+#   '2022D_part1' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part1.json',
+#   '2022D_part2' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part2.json',
+#   '2022D_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
+#   '2022D_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
+#   '2022E'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
+#   '2022F'       : 'Cert_Collisions2022_eraF_360390_362167_Golden.json',
+#   '2022G'       : 'Cert_Collisions2022_eraG_362433_362760_Golden.json',
 
   '2023B'       : 'Cert_Collisions2023_eraB_366403_367079_Golden.json',
   '2023C'       : 'Cert_Collisions2023_eraC_367095_368823_Golden.json',
   '2023D'       : 'Cert_Collisions2023_eraD_369803_370790_Golden.json',
-
-  '2024B'       : 'Cert_Collisions2024_eraB_Golden.json',
-  '2024C'       : 'Cert_Collisions2024_eraC_Golden.json',
-  '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
-  '2024E'       : 'Cert_Collisions2024_eraE_Golden.json',
-  '2024F'       : 'Cert_Collisions2024_eraF_Golden.json',
+# 
+#   '2024B'       : 'Cert_Collisions2024_eraB_Golden.json',
+#   '2024C'       : 'Cert_Collisions2024_eraC_Golden.json',
+#   '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
+#   '2024E'       : 'Cert_Collisions2024_eraE_Golden.json',
+#   '2024F'       : 'Cert_Collisions2024_eraF_Golden.json',
+#   '2024G'       : 'Cert_Collisions2024_378981_386071_golden_eraG.json',
+#   '2024H'       : 'Cert_Collisions2024_378981_386071_golden_eraH.json',
 }
 
 
@@ -122,6 +127,10 @@ for era in json_file_dict.keys():
     if int(irun) > 382229 : 
       ditau_v = 'v11'
       mutau_v = 'v6'
+    if int(irun) > 383811 : 
+      ditau_v = 'v12'
+      mutau_v = 'v7'
+
     
     if path_type=='ditau':
       path_name = 'HLT_DoubleMediumChargedIsoDisplacedPFTauHPS32_Trk1_eta2p1_%s'%ditau_v
