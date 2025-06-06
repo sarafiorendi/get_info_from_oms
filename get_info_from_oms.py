@@ -91,6 +91,7 @@ for era in json_file_dict.keys():
   run_pu_dict = {}
   run_rate_dict = {}
   run_prescale_dict = {}
+  run_psindex_dict = {}
   
   for irun in good_ls_dict.keys():
     print ('now working on run', irun)
@@ -107,6 +108,7 @@ for era in json_file_dict.keys():
       run_fill_dict[irun, this_ls] = ls['attributes']['fill_number']
       run_pu_dict[irun, this_ls] = ls['attributes']['pileup']
       run_prescale_dict[irun, this_ls] = ls['attributes']['prescale_name']
+      run_psindex_dict[irun, this_ls] = ls['attributes']['prescale_index']
   
     print ('filled inst lumi dict')
 
@@ -166,6 +168,7 @@ for era in json_file_dict.keys():
   fill_df = pd.DataFrame.from_dict(run_fill_dict, orient='index', columns=['fill'])
   pu_df   = pd.DataFrame.from_dict(run_pu_dict, orient='index', columns=['pileup'])
   ps_df   = pd.DataFrame.from_dict(run_prescale_dict, orient='index', columns=['prescale'])
+  idx_df  = pd.DataFrame.from_dict(run_psindex_dict, orient='index', columns=['prescale_index'])
   
   lumi_df.index = lumi_df.index.set_names(['run_ls'])
   lumi_df.reset_index()
@@ -185,11 +188,15 @@ for era in json_file_dict.keys():
 
   ps_df.index = ps_df.index.set_names(['run_ls'])
   ps_df.reset_index()
+
+  idx_df.index = idx_df.index.set_names(['run_ls'])
+  idx_df.reset_index()
   
   result_tmp  = fill_df.merge(lumi_df   , left_on='run_ls', right_on='run_ls')
   result_tmp2 = rate_df.merge(result_tmp, left_on='run_ls', right_on='run_ls')
   result_tmp3 = pu_df.merge(result_tmp2, left_on='run_ls', right_on='run_ls')
-  result      = ps_df.merge(result_tmp3, left_on='run_ls', right_on='run_ls')
+  result_tmp4 = ps_df.merge(result_tmp3, left_on='run_ls', right_on='run_ls')
+  result      = idx_df.merge(result_tmp4, left_on='run_ls', right_on='run_ls')
   result.to_csv('rate_lumi_pu_%s_%s_test.csv'%(path_type,era), index=True)
   
   # out = result.to_json(orient='index')[1:-1].replace('},{', '} {')
