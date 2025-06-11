@@ -18,7 +18,7 @@ parser.add_argument(
 parser.add_argument(
 	"--path",
 	required=False,
-	choices=['ditau','etau', 'mutau'],
+	choices=['ditau','etau', 'mutau', 'displphoton'],
 	default='ditau',
 	type=str,
 	help='Specify the hlt path')
@@ -37,30 +37,30 @@ nLS = args.nls
 
 
 json_file_dict = {
-#   '2022B_part2' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part2.json',
-#   '2022C_part1' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part1.json',
-#   '2022C_part2' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part2.json',
-#   '2022C_part3' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part3.json',
-#   '2022C_part4' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part4.json',
-#   '2022D_part1' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part1.json',
-#   '2022D_part2' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part2.json',
-#   '2022D_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
-#   '2022D_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
-#   '2022E'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
-#   '2022F'       : 'Cert_Collisions2022_eraF_360390_362167_Golden.json',
-#   '2022G'       : 'Cert_Collisions2022_eraG_362433_362760_Golden.json',
+  '2022B_part2' : 'Cert_Collisions2022_eraB_355100_355769_Golden_part2.json',
+  '2022C_part1' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part1.json',
+  '2022C_part2' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part2.json',
+  '2022C_part3' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part3.json',
+  '2022C_part4' : 'Cert_Collisions2022_eraC_355862_357482_Golden_part4.json',
+  '2022D_part1' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part1.json',
+  '2022D_part2' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part2.json',
+  '2022D_part3' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part3.json',
+  '2022D_part4' : 'Cert_Collisions2022_eraD_357538_357900_Golden_part4.json',
+  '2022E'       : 'Cert_Collisions2022_eraE_359022_360331_Golden.json',
+  '2022F'       : 'Cert_Collisions2022_eraF_360390_362167_Golden.json',
+  '2022G'       : 'Cert_Collisions2022_eraG_362433_362760_Golden.json',
 
   '2023B'       : 'Cert_Collisions2023_eraB_366403_367079_Golden.json',
   '2023C'       : 'Cert_Collisions2023_eraC_367095_368823_Golden.json',
   '2023D'       : 'Cert_Collisions2023_eraD_369803_370790_Golden.json',
-# 
-#   '2024B'       : 'Cert_Collisions2024_eraB_Golden.json',
-#   '2024C'       : 'Cert_Collisions2024_eraC_Golden.json',
-#   '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
-#   '2024E'       : 'Cert_Collisions2024_eraE_Golden.json',
-#   '2024F'       : 'Cert_Collisions2024_eraF_Golden.json',
-#   '2024G'       : 'Cert_Collisions2024_378981_386071_golden_eraG.json',
-#   '2024H'       : 'Cert_Collisions2024_378981_386071_golden_eraH.json',
+
+  '2024B'       : 'Cert_Collisions2024_eraB_Golden.json',
+  '2024C'       : 'Cert_Collisions2024_eraC_Golden.json',
+  '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
+  '2024E'       : 'Cert_Collisions2024_eraE_Golden.json',
+  '2024F'       : 'Cert_Collisions2024_eraF_Golden.json',
+  '2024G'       : 'Cert_Collisions2024_378981_386071_golden_eraG.json',
+  '2024H'       : 'Cert_Collisions2024_378981_386071_golden_eraH.json',
 }
 
 
@@ -115,11 +115,22 @@ for era in json_file_dict.keys():
     ## now fetch rate information per lumisection
     ditau_v = 'v1'
     mutau_v = 'v3'
+    displphoton_v = 'v11'
+    displphoton2023_v = 'v1'
 #     path_name = 'HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_%s'%path_v
-    if int(irun) > 355862: ditau_v = 'v2'
+    if int(irun) > 355862: 
+      ditau_v = 'v2'
+      displphoton_v = 'v12'
     if int(irun) > 359246 : ditau_v = 'v3'
+    if int(irun) >= 359568:
+      displphoton_v = 'v13'
+    if int(irun) >= 361971:
+      displphoton_v = 'v14'
+      
     if int(irun) > 366403 : ditau_v = 'v4'
-    if int(irun) > 367661 : ditau_v = 'v5'
+    if int(irun) > 367661 : 
+      ditau_v = 'v5'
+      displphoton2023_v = 'v2'
     ## from here is 2024
     if int(irun) > 378985 : ditau_v = 'v8'
     if int(irun) > 380306 : 
@@ -142,6 +153,11 @@ for era in json_file_dict.keys():
       path_name = 'HLT_DisplacedMu24_MediumChargedIsoDisplacedPFTauHPS24_%s'%mutau_v
     elif path_type=='etau':
       path_name = 'HLT_Photon34_R9Id90_CaloIdL_IsoL_DisplacedIdL_MediumChargedIsoDisplacedPFTauHPS34_%s'%mutau_v
+    elif path_type=='displphoton' and '2022' in era:
+      path_name = 'HLT_Photon60_R9Id90_CaloIdL_IsoL_DisplacedIdL_PFHT350MinPFJet15_%s'%displphoton_v
+    elif path_type=='displphoton' and '2023' in era:
+      path_name = 'HLT_Photon60_R9Id90_CaloIdL_IsoL_DisplacedIdL_PFHT350_%s'%displphoton2023_v
+      
     else:
       print ('path type not recognised')
       exit()  
@@ -197,7 +213,7 @@ for era in json_file_dict.keys():
   result_tmp3 = pu_df.merge(result_tmp2, left_on='run_ls', right_on='run_ls')
   result_tmp4 = ps_df.merge(result_tmp3, left_on='run_ls', right_on='run_ls')
   result      = idx_df.merge(result_tmp4, left_on='run_ls', right_on='run_ls')
-  result.to_csv('rate_lumi_pu_%s_%s_test.csv'%(path_type,era), index=True)
+  result.to_csv('rate_lumi_pu_%s_%s.csv'%(path_type,era), index=True)
   
   # out = result.to_json(orient='index')[1:-1].replace('},{', '} {')
   # with open('rate_lumi_eraD%s.json'%part_str, 'w') as f:
