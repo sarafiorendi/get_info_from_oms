@@ -11,7 +11,7 @@ omsapi.auth_oidc(my_app_id,my_app_secret)
 parser = argparse.ArgumentParser(description="get info from oms")
 parser.add_argument(
 	"--year",
-	choices=['2022','2023', '2024'],
+	choices=['2022','2023', '2024', '2025'],
 	required=True,
 	help='Specify the year you want to investigate')
 
@@ -62,6 +62,11 @@ json_file_dict = {
   '2024G'       : 'Cert_Collisions2024_378981_385801_golden_eraG.json',
   '2024H'       : '2024H_Golden.json',
   '2024I'       : '2024I_Golden.json',
+
+  '2025B'       : 'Cert_Collisions2025B_Golden.json',
+  '2025C'       : 'Cert_Collisions2025C_Golden.json',
+  '2025Cdcs'    : 'Cert_Collisions2025C_from393461_DCS.json',
+  '2025D'       : 'Cert_Collisions2025D_DCS.json',
 }
 
 
@@ -153,6 +158,12 @@ for era in json_file_dict.keys():
       ditau_v = 'v12'
       mutau_v = 'v7'
       diphoton_v = 'v9'
+    if int(irun) > 391666 : 
+      ditau_v = 'v14'
+    if int(irun) > 392290 : 
+      ditau_v = 'v15'
+    if int(irun) > 394637 : 
+      ditau_v = 'v16'
 
 
     
