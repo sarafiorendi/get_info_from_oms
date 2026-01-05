@@ -11,6 +11,9 @@ from matplotlib.pyplot import figure
 import more_itertools
 import matplotlib.ticker as plticker
 
+import numpy as np
+import yaml
+
 # import cmsstyle as CMS
 # CMS.SetEnergy("13.6")
 # CMS.SetLumi("")
@@ -93,8 +96,6 @@ def concat_n_consecutive(test_list, n):
 # all_eras = ['B_part2','C_part1', 'C_part2', 'C_part3', 'C_part4', \
 #             'D_part1', 'D_part2', 'D_part3', 'D_part4', 'E', 'F', 'G']
 # all_eras = ['E', 'F', 'G']
-
-
 if year == '2022':
   all_eras = ['B','C', 'D', 'E', 'F', 'G']
   if path_type=='ditau':
@@ -105,7 +106,7 @@ if year == '2023':
     all_eras = ['D']
 if year == '2024':
 #   all_eras = ['B','C', 'D', 'E', 'F', 'G', 'H', 'I']
-  all_eras = ['C', 'D']#, 'E']#, 'F']
+  all_eras = ['C']#, 'D']#, 'E']#, 'F']
 if year == '2025':
   all_eras = ['B', 'C', 'Cdcs', 'D']
 
@@ -210,15 +211,8 @@ if args.perfill == True:
 
 plt.clf()
 fig, ax = plt.subplots()
-hepdata_x = np.empty(0)
-hepdata_y = np.empty(0)
 for era, d in df_all.groupby('era'):
-    ## do not split color by era
-    plt.scatter(x=d['pileup'], y=d['rate'], label=era, s=10, c='b')
-    hepdata_x = np.append(hepdata_x, np.array(d['pileup']))
-    hepdata_y = np.append(hepdata_y, np.array(d['rate']))
-    ## change color by era
-#     plt.scatter(x=d['pileup'], y=d['rate'], label=era, s=10)#, c='b')
+    plt.scatter(x=d['pileup'], y=d['rate'], label=era, s=10)#, c='b')
 
 ax.set_ylabel('HLT rate [Hz]')
 ax.set_xlabel('PU')
@@ -232,81 +226,55 @@ ax.set_xlim(0, 70)
 # hep.cms.label("Preliminary", data = True,  year=year, ax=ax, loc=4)
 # hep.cms.label("Preliminary", data = True,  com=13.6, ax=ax, loc=4)
 # hep.cms.text(100, ax=ax, loc=4)
-
 ## for 2023
 if path_type =='ditau' and year == '2023':
-  ax.text(35.5, 15.2, f'9.5 fb$^{{-1}}$ ({year}) (13.6 TeV)', fontsize=24)
+  ax.text(43, 15.2, r'9.5 fb$^{-1}$(13.6 TeV)', fontsize=24)
+# hep.cms.text('Preliminary, 2023', ax=ax, loc=2)
 ## for 2022
 elif year == '2022':
   if path_type =='displphoton':
-    ax.text(43, 50.2, r'26.7 fb$^{-1}$ (13.6 TeV)', fontsize=24)
+    ax.text(43, 50.2, r'26.7 fb$^{-1}$(13.6 TeV)', fontsize=24)
   elif path_type =='diphoton': ## 2024
-    ax.text(43, 40.2, r'XX fb$^{-1}$ (13.6 TeV)', fontsize=24)
+    ax.text(43, 40.2, r'XX fb$^{-1}$(13.6 TeV)', fontsize=24)
   else:
-    ax.text(34, 15.2, f'26.7 fb$^{{-1}}$ ({year}) (13.6 TeV)', fontsize=24)
+    ax.text(43, 15.2, r'26.7 fb$^{-1}$(13.6 TeV)', fontsize=24)
 # hep.cms.text('Preliminary, {}'.format(year), ax=ax, loc=2)
-# hep.cms.text('{}'.format(year), ax=ax, loc=2)
-hep.cms.text('', ax=ax, loc=2)
+hep.cms.text('{}'.format(year), ax=ax, loc=2)
 
-# plt.legend(handletextpad=0.1)
+plt.legend(handletextpad=0.1)
 # plt.grid(True)
 plt.savefig('plots_%s/rate_vs_pileup_%s_%s.pdf'%(path_type, era_short_string, path_type))
 plt.savefig('plots_%s/rate_vs_pileup_%s_%s.png'%(path_type, era_short_string, path_type))
 
-### save to csv for HepData
-import numpy as np
-import yaml
-## write YAML file
-if path_type=='ditau':
-    hepdata_table = {
-        "independent_variables": [
-            {
-                "header": {"name": "pileup"},
-                "values": [{"value": float(v)} for v in hepdata_x]
-            }
-        ],
-        "dependent_variables": [
-            {
-                "header": {"name": "rate"},
-                "values": [{"value": float(v)} for v in hepdata_y]
-            }
-        ]
-    }
-    with open(f"/Users/sara/Desktop/displacedTaus/plots_for_llp_paper/hepData/HepData_EXO-23-016/data_Sara/hepdata_{path_type}_rate_{year}.yaml", "w") as f:
-        yaml.dump(hepdata_table, f, sort_keys=False)
 
-
-# print (df_all['prescale'].unique())
+print (df_all['prescale'].unique())
 ## skim on prescale column
 ## df_all['prescale'].unique()
 if year =='2022':
   all_possible_prescales = [ 
-#        '1p60E+34',
-#        '1p70E+34', '1p50E+34', '1p40E+34', '1p30E+34', '1p20E+34',
-#        '1p10E+34', '2p00E+34', '9p00E+33',
-#        '2p00E+34+ZeroBias+HLTPhysics', 
-#        '2p10E+34', '2p20E+34', 
-#        '2p0E34',
-#        '0p9E34', '1p1E34', '1p3E34', '2p0E34+ZeroBias+HLTPhysics',
-#        '1p2E34', '1p4E34', '1p6E34', '1p5E34', '1p0E34', '0p8E34',
-#        '0p7E34', 
+       '1p60E+34',
+       '1p70E+34', '1p50E+34', '1p40E+34', '1p30E+34', '1p20E+34',
+       '1p10E+34', '2p00E+34', '9p00E+33',
+       '2p00E+34+ZeroBias+HLTPhysics', 
+       '2p10E+34', '2p20E+34', 
+       '2p0E34',
+       '0p9E34', '1p1E34', '1p3E34', '2p0E34+ZeroBias+HLTPhysics',
+       '1p2E34', '1p4E34', '1p6E34', '1p5E34', '1p0E34', '0p8E34',
+       '0p7E34', 
        '1p8E34', 
-#        '1p7E34', 
-#        '0p6E34', 
-#        '1p9E34', 
-#        '2p1E34',
-#        '2p2E34', '2p3E34'
-       ]
+       '1p7E34', 
+       '0p6E34', 
+       '1p9E34', 
+       '2p1E34',
+       '2p2E34', '2p3E34']
 
 elif year =='2023':
   all_possible_prescales = [ 
-       '2p0E34', 
-#        '1p7E34', '1p1E34', '0p8E34', '0p6E34',
-#        '0p9E34', '1p0E34', '1p2E34', '1p3E34', '1p5E34', '1p6E34',
-#        '1p4E34', '0p7E34', '1p8E34', '2p0E34+ZeroBias+HLTPhysics',
-#        '1p9E34', '2p0E34+HLTPhysics', '2p0E34+ZeroBias', '2p1E34',
-#        '2p2E34', '2p0E34noHMT', '2p05E34'
-       ]
+       '2p0E34', '1p7E34', '1p1E34', '0p8E34', '0p6E34',
+       '0p9E34', '1p0E34', '1p2E34', '1p3E34', '1p5E34', '1p6E34',
+       '1p4E34', '0p7E34', '1p8E34', '2p0E34+ZeroBias+HLTPhysics',
+       '1p9E34', '2p0E34+HLTPhysics', '2p0E34+ZeroBias', '2p1E34',
+       '2p2E34', '2p0E34noHMT', '2p05E34']
 
 elif year =='2024':
   all_possible_prescales = [ 
@@ -327,24 +295,20 @@ if args.allprescale:
     print (iprescale)
     
     df_all_tmp = df_all[df_all.prescale == iprescale]
-    hepdata_x = np.empty(0)
-    hepdata_y = np.empty(0)
-  
+ 
     plt.clf()
     fig, ax = plt.subplots()
     for era, d in df_all_tmp.groupby('era'):
-        ## do not split color by era
-        plt.scatter(x=d['pileup'], y=d['rate'], label=era, s=10, c='b')
-        hepdata_x = np.append(hepdata_x, np.array(d['pileup']))
-        hepdata_y = np.append(hepdata_y, np.array(d['rate']))
-        ## change color by era
-#         plt.scatter(x=d['pileup'], y=d['rate'], label=era, s=10)#, c='b')
-#         plt.legend()
+        plt.scatter(x=d['pileup'], y=d['rate'], label=era, s=10)#, c='b')
+        plt.legend()
   
     ax.set_ylabel('HLT rate [Hz]', fontsize=31)
     ax.set_xlabel('PU', fontsize=31)
     plt.xticks(fontsize=30)  # Change the font size of x-axis tick labels
     plt.yticks(fontsize=30)  # Change the font size of x-axis tick labels
+  
+  #   plt.rc('xtick', labelsize=40) 
+  #   plt.rcParams.update({'font.size': 30})
   
     ax.set_ylim(0, 15)
     if path_type=='displphoton':
@@ -354,17 +318,17 @@ if args.allprescale:
     ax.set_xlim(0, 70)
     if year == '2022':
       if path_type !='displphoton':
-        ax.text(25, 15.2, r' fb$^{-1}$ (2022) (13.6 TeV)', fontsize=30)
+        ax.text(38, 15.2, r' fb$^{-1}$(13.6 TeV)', fontsize=30)
       elif iprescale == '1p8E34':
-        ax.text(25, 50.5, r'10.6 fb$^{-1}$ (2022) (13.6 TeV)', fontsize=30)
+        ax.text(38, 50.5, r'10.6 fb$^{-1}$(13.6 TeV)', fontsize=30)
     elif year == '2023':
       if iprescale == '2p0E34':
-        ax.text(27, 50.5, r'3.1 fb$^{-1}$ (2023) (13.6 TeV)', fontsize=30)
+        ax.text(39, 50.3, r'3.1 fb$^{-1}$(13.6 TeV)', fontsize=30)
     elif year == '2024':
       if path_type =='diphoton' and iprescale == '1p8E34':
         ax.set_ylim(0, 15)
-        ax.text(37, 15.15, r'14.2 fb$^{-1}$ (13.6 TeV)', fontsize=30, fontweight='normal')
-    hep.cms.text('', ax=ax, loc=2)
+        ax.text(37, 15.15, r'14.2 fb$^{-1}$(13.6 TeV)', fontsize=30, fontweight='normal')
+    hep.cms.text('{}'.format(year), ax=ax, loc=2)
   #   hep.cms.text('Preliminary, {}'.format(year), ax=ax, loc=2)
   
     # ax.text(6, 30, r'prescale column {}'.format(iprescale), fontsize=20)
@@ -373,23 +337,96 @@ if args.allprescale:
     plt.savefig('plots_%s/rate_vs_pileup_new_%s_%s_ps%s.pdf'%(path_type, era_short_string, path_type, iprescale))
     plt.savefig('plots_%s/rate_vs_pileup_new_%s_%s_ps%s.png'%(path_type, era_short_string, path_type, iprescale))
 
-    if (path_type=='displphoton' and iprescale == '2p0E34' and year == '2023') or \
-       (path_type=='displphoton' and iprescale == '1p8E34' and year == '2022'):
+
+
+   ### try color per RUN
+    if path_type !='diphoton' and year != '2024':
+      continue
+
+    df_all_tmp = df_all[df_all.prescale == iprescale]
+  
+    plt.clf()
+    fig, ax = plt.subplots()
+ 
+    for fill, d in df_all_tmp.groupby('fill'):
+        if fill <= 9570:  continue
+        all_x = []
+        all_y = []
+        all_fill = []
+
+        plt.scatter(x=d['pileup'], y=d['rate'], label='Fill ' + str(fill), s=12)
+        plt.legend(loc='upper center', bbox_to_anchor=(0.45, 1.0), handletextpad=0.1)
+
+        ### save to csv for HepData
+        ## write YAML file per fill
+        all_x.extend(d['pileup'].tolist())
+        all_y.extend(d['rate'].tolist())
+        all_fill.extend([fill] * len(d))
+        
+        print (fill, len(d), len(all_x), len(all_fill), len(d['pileup']))
+
         hepdata_table = {
             "independent_variables": [
                 {
                     "header": {"name": "pileup"},
-                    "values": [{"value": float(v)} for v in hepdata_x]
+                    "values": [{"value": float(v)} for v in all_x]
                 }
             ],
             "dependent_variables": [
                 {
                     "header": {"name": "rate"},
-                    "values": [{"value": float(v)} for v in hepdata_y]
+                    "values": [{"value": float(v)} for v in all_y]
+                },
+                {
+                    "header": {"name": "fill"},
+                    "values": [{"value": int(v)} for v in all_fill]
                 }
             ]
         }
-        with open(f"/Users/sara/Desktop/displacedTaus/plots_for_llp_paper/hepData/HepData_EXO-23-016/data_Sara/hepdata_{path_type}_rate_{year}.yaml", "w") as f:
+        print ('\n', len(all_fill), len(all_x), len(all_y))
+        
+        with open(f"/Users/sara/Desktop/displacedTaus/plots_for_llp_paper/hepData/HepData_EXO-23-016/data_Sara/hepdata_{path_type}_rate_{year}_fill{fill}.yaml", "w") as f:
             yaml.dump(hepdata_table, f, sort_keys=False)
+  
+        plt.savefig('plots_%s/rate_vs_pileup_new_perFill_lastFour_%s_%s_ps%s_onlyFill%s.pdf'%(path_type, era_short_string, path_type, iprescale, fill))
+    ax.set_ylabel('HLT rate [Hz]', fontsize=31)
+    ax.set_xlabel('PU', fontsize=31)
+    plt.xticks(fontsize=30)  # Change the font size of x-axis tick labels
+    plt.yticks(fontsize=30)  # Change the font size of x-axis tick labels
+  
+    ax.set_xlim(0, 70)
+    ax.set_ylim(0, 10)
+    ax.text(23, 10.12, r'0.677 fb$^{-1}$ (2024) (13.6 TeV)', fontsize=30, fontweight='normal')
+#       ax.text(37, 15.15, r'14.2 fb$^{-1}$(13.6 TeV)', fontsize=30, fontweight='normal')
+    hep.cms.text('', ax=ax, loc=2)
+#     hep.cms.text('{}'.format(year), ax=ax, loc=2)
+  
+#     plt.grid(True)
+    plt.savefig('plots_%s/rate_vs_pileup_new_perFill_lastFour_%s_%s_ps%s.pdf'%(path_type, era_short_string, path_type, iprescale))
+    plt.savefig('plots_%s/rate_vs_pileup_new_perFill_lastFour_%s_%s_ps%s.png'%(path_type, era_short_string, path_type, iprescale))
+
+
+'''
+fills era C
+9539
+9543
+9548
+9559
+9562
+9564
+9565
+9566
+9567
+9568
+9569
+9570
+9573
+9574
+9575
+9579
+'''
+
+
+
        
 exit(0)

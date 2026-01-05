@@ -18,7 +18,7 @@ parser.add_argument(
 parser.add_argument(
 	"--path",
 	required=False,
-	choices=['ditau','etau', 'mutau', 'displphoton'],
+	choices=['ditau','etau', 'mutau', 'displphoton', 'diphoton'],
 	default='ditau',
 	type=str,
 	help='Specify the hlt path')
@@ -59,8 +59,9 @@ json_file_dict = {
   '2024D'       : 'Cert_Collisions2024_eraD_Golden.json',
   '2024E'       : 'Cert_Collisions2024_eraE_Golden.json',
   '2024F'       : 'Cert_Collisions2024_eraF_Golden.json',
-  '2024G'       : 'Cert_Collisions2024_378981_386071_golden_eraG.json',
-  '2024H'       : 'Cert_Collisions2024_378981_386071_golden_eraH.json',
+  '2024G'       : 'Cert_Collisions2024_378981_385801_golden_eraG.json',
+  '2024H'       : '2024H_Golden.json',
+  '2024I'       : '2024I_Golden.json',
 }
 
 
@@ -113,10 +114,14 @@ for era in json_file_dict.keys():
     print ('filled inst lumi dict')
 
     ## now fetch rate information per lumisection
+    ## first check the right version of the path
+    ## can be done using brilcalc e.g.
+    ## brilcalc lumi -c web --hltpath "HLT_DiPhoton10Time1ns_v*" -u /fb -i Cert_Collisions2024_378981_386951_Golden.json
     ditau_v = 'v1'
     mutau_v = 'v3'
     displphoton_v = 'v11'
     displphoton2023_v = 'v1'
+    diphoton_v = 'v7'
 #     path_name = 'HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_%s'%path_v
     if int(irun) > 355862: 
       ditau_v = 'v2'
@@ -133,6 +138,8 @@ for era in json_file_dict.keys():
       displphoton2023_v = 'v2'
     ## from here is 2024
     if int(irun) > 378985 : ditau_v = 'v8'
+    if int(irun) > 380238 : 
+      diphoton_v = 'v8'
     if int(irun) > 380306 : 
       ditau_v = 'v9'
       mutau_v = 'v4'
@@ -145,6 +152,8 @@ for era in json_file_dict.keys():
     if int(irun) > 383811 : 
       ditau_v = 'v12'
       mutau_v = 'v7'
+      diphoton_v = 'v9'
+
 
     
     if path_type=='ditau':
@@ -157,6 +166,9 @@ for era in json_file_dict.keys():
       path_name = 'HLT_Photon60_R9Id90_CaloIdL_IsoL_DisplacedIdL_PFHT350MinPFJet15_%s'%displphoton_v
     elif path_type=='displphoton' and '2023' in era:
       path_name = 'HLT_Photon60_R9Id90_CaloIdL_IsoL_DisplacedIdL_PFHT350_%s'%displphoton2023_v
+    elif path_type=='diphoton':
+      path_name = 'HLT_DiPhoton10Time1ns_%s'%diphoton_v
+      
       
     else:
       print ('path type not recognised')
